@@ -1,0 +1,52 @@
+---
+title: "Population Graphs Along Contigs: SNP Proximity & Topological Convergence"
+description: |
+  With the ever increasing use of sequencing in the analysis of both neutral and putatively adaptive genetic variance the ability to recover genetic covartiance becomes increasinly difficult as the density of information rich genetic markers incereases.  In this manuscript, we examine the extent to which population genetic structure, as measured through population graphs, is influenced by locus proximity.
+author:
+  - name: Rodney J. Dyer
+    url: https://dyerlab.org
+    affiliation: Center for Environmental Studies<br>Virginia Commonwealth University<br>&nbsp;
+    affiliation_url: https://ces.vcu.edu
+    orcid_id: 0000-0003-4707-3453
+  - name: Brian C. Verrelli
+    url: https://rampages.us/bcverrelli/
+    affiliation: Center for Biological Data Science<br>Virginia Commonwealth University<br>&nbsp;
+    affiliation_url: https://cbds.vcu.edu
+    orcid_id: 0000-0002-9670-4920
+  - name: Andrew J. Eckert
+    url: https://www.eckertlab.com/
+    affiliation: Department of Biology<br>Virginia Commonwealth University
+    affiliation_url: https://biology.vcu.edu
+    orcid_id: 0000-0002-6522-2646
+
+date: "`r Sys.Date()`"
+output: distill::distill_article
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+
+Specifically, we test the following questions:  
+
+1. How many SNP loci are necessary to gain a stable genetic covariance structure as measured through a population graph?
+
+2. Are there metrics that can be used to define topological and structural similarity in one or more population graphs?
+
+3. Some other thing.
+
+
+
+
+# Methods
+
+## Assympototic Stability
+
+```{r}
+
+```
+
+
+## Sampling Intensity

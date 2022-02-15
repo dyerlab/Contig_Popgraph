@@ -37,3 +37,8 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+
+# Ignore any data derived from the single original data set.
+data/*.rda
+data/snps_*
