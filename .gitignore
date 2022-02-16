@@ -42,3 +42,4 @@ vignettes/*.pdf
 # Ignore any data derived from the single original data set.
 data/*.rda
 data/snps_*
+*.html

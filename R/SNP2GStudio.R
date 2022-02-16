@@ -15,9 +15,11 @@ system("head -1 data/chr2.umich.phased.ordered.snp > data/snps_rss_names.txt")
 system("head -5 data/chr2.umich.phased.ordered.snp | tail -1 > data/snps_positions.txt")
 names <- str_split( readLines("data/snps_rss_names.txt", n=1), pattern = " " )[[1]]
 locations <- str_split( readLines("data/snps_positions.txt", n=1), pattern = " " )[[1]]
-df_snps <- data.frame( Name = names, Location = locations)
-
+data.frame( Name = names, Location = as.numeric(locations) ) %>%
+  arrange( Location ) -> df_snps 
 save( df_snps, file="data/df_snps.rda")
+unlink("data/snps_positions.txt")
+unlink("data/snps_rss_names.txt")
 
 # Pull meta data and save a data.frame
 system('cat data/chr2.umich.phased.ordered.snp| cut -d " " -f 1-7 | tail -1194 > snps_sample_info.txt')
@@ -31,7 +33,7 @@ read_delim("snps_sample_info.txt", delim = " ", col_names=FALSE) %>%
   save(df_samples, file="data/df_samples.rda")
 
 
-  
+
   
 
 

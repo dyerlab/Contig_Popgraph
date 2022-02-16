@@ -1,5 +1,5 @@
 ---
-title: "Population Graphs Along Contigs: SNP Proximity & Topological Convergence"
+title: "Population Graphs On Contigs: SNP Proximity & Topological Convergence"
 description: |
   With the ever increasing use of sequencing in the analysis of both neutral and putatively adaptive genetic variance the ability to recover genetic covartiance becomes increasinly difficult as the density of information rich genetic markers incereases.  In this manuscript, we examine the extent to which population genetic structure, as measured through population graphs, is influenced by locus proximity.
 author:
@@ -8,23 +8,18 @@ author:
     affiliation: Center for Environmental Studies<br>Virginia Commonwealth University<br>&nbsp;
     affiliation_url: https://ces.vcu.edu
     orcid_id: 0000-0003-4707-3453
-  - name: Brian C. Verrelli
-    url: https://rampages.us/bcverrelli/
-    affiliation: Center for Biological Data Science<br>Virginia Commonwealth University<br>&nbsp;
-    affiliation_url: https://cbds.vcu.edu
-    orcid_id: 0000-0002-9670-4920
-  - name: Andrew J. Eckert
-    url: https://www.eckertlab.com/
-    affiliation: Department of Biology<br>Virginia Commonwealth University
-    affiliation_url: https://biology.vcu.edu
-    orcid_id: 0000-0002-6522-2646
-
 date: "`r Sys.Date()`"
 output: distill::distill_article
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+library( tidyverse )
+theme_set( theme_minimal(base_size=14 ))
+
+if( length(list.files("./data/", pattern = ".rda")) < 2 ) { 
+  source("1_SNP2GStudio.R")
+}
 ```
 
 
@@ -41,6 +36,29 @@ Specifically, we test the following questions:
 
 
 # Methods
+
+## The Data
+
+```{r}
+load("data/df_snps.rda")
+K <- nrow(df_snps)
+df_snps$dist <- NA
+df_snps$dist[2:K] = df_snps$Location[2:K] - df_snps$Location[1:(K-1)]
+```
+
+
+For this manuscript, we are using the single nucleotide polymorphisms (SNP) data from HGDP-CEPH for Chromosome 2.  This consists of `r K` mapped variable nucleotide sites.  Distances between individual snps ranged from `r min(df_snps$dist)` - `r max(df_snps$dist)` whose distribution of inter-snp distances are arranged as shown in Figure \@ref(fig:snp-distance). 
+
+```{r snp-distance, fig.cap="The distribution of nearest neighbor distances for individual SNPs along Chromosome 2"}
+df_snps %>%
+  filter( !is.na(dist) ) %>%
+  ggplot( aes(log(dist,base = 10)  ) ) + 
+  geom_density()  + 
+  xlab(expression(log[10](Nucleotide~Distance))) +
+  ylab("Frequency")
+```
+
+
 
 ## Assympototic Stability
 
