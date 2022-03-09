@@ -1,5 +1,5 @@
 ---
-title: "Population Graphs On Contigs: SNP Proximity & Topological Convergence"
+title: "Population Graphs On Contigs: Topological Convergence"
 description: |
   With the ever increasing use of sequencing in the analysis of both neutral and putatively adaptive genetic variance the ability to recover genetic covartiance becomes increasinly difficult as the density of information rich genetic markers incereases.  In this manuscript, we examine the extent to which population genetic structure, as measured through population graphs, is influenced by locus proximity.
 author:
@@ -14,11 +14,14 @@ output: distill::distill_article
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+options( tidyverse.quiet = TRUE, 
+         dplyr.summarise.inform = FALSE )
+
 library( tidyverse )
 theme_set( theme_minimal(base_size=14 ))
 
-if( length(list.files("./data/", pattern = ".rda")) < 2 ) { 
-  source("1_SNP2GStudio.R")
+if( length(list.files("./data/", pattern = ".sqlite")) < 1 ) { 
+  source("R/SNPSummaries.R")
 }
 ```
 
@@ -47,7 +50,7 @@ df_snps$dist[2:K] = df_snps$Location[2:K] - df_snps$Location[1:(K-1)]
 ```
 
 
-For this manuscript, we are using the single nucleotide polymorphisms (SNP) data from HGDP-CEPH for Chromosome 2.  This consists of `r K` mapped variable nucleotide sites.  Distances between individual snps ranged from `r min(df_snps$dist)` - `r max(df_snps$dist)` whose distribution of inter-snp distances are arranged as shown in Figure \@ref(fig:snp-distance). 
+For this manuscript, single nucleotide polymorphisms (SNP) data from HGDP-CEPH for Chromosome 2 were used due to the relative density of variable markers.  These data consist of `r K` mapped variable nucleotide sites.  Distances between individual snps ranged from `r min(df_snps$dist, na.rm=TRUE)`bp - `r format(max(df_snps$dist, na.rm=TRUE),digits=2, scientific=TRUE)`bp (the largest spanning the centromere), whose distribution of inter-snp distances are arranged as shown in Figure \@ref(fig:snp-distance). 
 
 ```{r snp-distance, fig.cap="The distribution of nearest neighbor distances for individual SNPs along Chromosome 2"}
 df_snps %>%
@@ -61,6 +64,13 @@ df_snps %>%
 
 
 ## Assympototic Stability
+
+
+*Random Markers*
+
+
+Asymptotic convergence on topology from random SNP's.
+
 
 ```{r}
 

@@ -4,11 +4,13 @@
 
 library( tidyverse )
 library( stringr )
+library( gstudio )
+library( dplyr )
+library(DBI)
 
 # remove everything
 rm( list=ls() )
-system("rm data/snps_*")
-system("rm data/*.rda")
+
 
 # pull names and locations and save as a data.frame
 system("head -1 data/chr2.umich.phased.ordered.snp > data/snps_rss_names.txt")
@@ -17,25 +19,61 @@ names <- str_split( readLines("data/snps_rss_names.txt", n=1), pattern = " " )[[
 locations <- str_split( readLines("data/snps_positions.txt", n=1), pattern = " " )[[1]]
 data.frame( Name = names, Location = as.numeric(locations) ) %>%
   arrange( Location ) -> df_snps 
-save( df_snps, file="data/df_snps.rda")
-unlink("data/snps_positions.txt")
-unlink("data/snps_rss_names.txt")
+
+
 
 # Pull meta data and save a data.frame
-system('cat data/chr2.umich.phased.ordered.snp| cut -d " " -f 1-7 | tail -1194 > snps_sample_info.txt')
-read_delim("snps_sample_info.txt", delim = " ", col_names=FALSE) %>%
+system('cat data/chr2.umich.phased.ordered.snp| cut -d " " -f 1-7 | tail -1194 > data/snps_sample_info.txt')
+read_delim("data/snps_sample_info.txt", delim = " ", col_names=FALSE) %>%
   distinct() %>%
   mutate(Sex = factor(ifelse( X7 == "m", "Male", "Female") ),
          Population = factor( X3 ), 
          Location = factor( X4 ), 
          Region = factor( X5 ) ) %>%
   select( ID = X1, Population, Location, Region, Sex ) -> df_samples
-  save(df_samples, file="data/df_samples.rda")
-
-
-
   
 
 
+
+
+
+maxLoci <- 7+42588
+lineLength <- 20 
+
+
+
+for( i in 8:maxLoci) { 
+  cat(".")
+  cmd <- paste( 'cat data/chr2.umich.phased.ordered.snp | cut -d " " -f ', i, ' > data/tmp.csv' )
+  system( cmd, wait = TRUE )  
+  df <- readLines( "data/tmp.csv" )
+  
+  #make into loci
+  alleles <- seq(6,length(df))
+  idx1 <- alleles[ alleles %% 2 == 0]
+  idx2 <- alleles[ alleles %% 2 == 1]
+  
+  rawAlleles <- paste( df[idx1], df[idx2], sep=":")
+  loci <- locus( rawAlleles, type = "separated" )
+  locus_name <- df_snps$Name[ (i - 7) ]
+  df_samples[[locus_name]] <- loci
+  
+  
+  if( (i - 8) %% lineLength == 0) {
+    cat("[", i/lineLength, "/", maxLoci, "]\n")
+  }
+  
+}
+
+save(df_samples, file="data/df_samples.rda")
+save(df_snps, file="data/df_snps.rda")
+
+  
+  
+
 # Remove any cruft that is hanging around.
+unlink("data/snps_positions.txt")
+unlink("data/snps_rss_names.txt")
+unlink("data/snps_sample_info.txt")
+unlink("data/tmp.csv")
 rm( list=c("names","locations", "df_snps", "df_samples") )
