@@ -9,6 +9,7 @@ author:
     affiliation_url: https://ces.vcu.edu
     orcid_id: 0000-0003-4707-3453
 date: "`r Sys.Date()`"
+bibliography: bibliography.bib
 output: distill::distill_article
 ---
 
@@ -20,9 +21,9 @@ options( tidyverse.quiet = TRUE,
 library( tidyverse )
 theme_set( theme_minimal(base_size=14 ))
 
-if( length(list.files("./data/", pattern = ".sqlite")) < 1 ) { 
-  source("R/SNPSummaries.R")
-}
+#if( length(list.files("./data/", pattern = ".sqlite")) < 1 ) { 
+#  source("R/SNPSummaries.R")
+#}
 ```
 
 
@@ -39,6 +40,13 @@ Specifically, we test the following questions:
 
 
 # Methods
+
+
+## Graph Theoretic Definitions
+
+A graph contains two sets of objects, *nodes* often representing sampling locales, populations, or regions, and *edges* which specify the relationships between individual nodes.  In population genetic studies, graphs are often defined based upon pair-wise genetic distances (Nei's Distance, $D_{ps}$, etc.) or estimates of structure (pairwise $F_{ST}$, cGD, etc).
+
+For the purposes of this paper, genetic topologies will be created using conditional genetic distance (cGD) found within Population Graph [@Dyer2004,@Dyer2015]
 
 ## The Data
 
@@ -61,7 +69,38 @@ df_snps %>%
   ylab("Frequency")
 ```
 
+## Topological Similarity
 
+Network similarity may be partitioned into features based upon the *node*, on the *edge*, or on the overall construction of the network itself.  For comparision purposes, we will 
+
+*Node Centric Features*  
+
+- *Degree* The number of edges connected to a particular node in the network.    
+- *Node Betweenness* A measure of the relative number of the shortest paths in the network that contain each node.
+- *Node Closeness* The relative distance of a node to all other nodes in the network. 
+
+
+*Edge Centric Features*
+
+- *Edge Betweenness* The relative number of shortest paths in the entire network that contain each edge.
+- *Distance Congruence* The r
+- *Structural Congruence* 
+
+*Graph Features*
+
+- *Diameter* The distance through the graph connecting the two most distant nodes.
+- *Slope<sub>Degree</sub>* - 
+
+Feature                | Description    
+-----------------------|------------------------------   
+Degree                 | The number of edges connected to a node    
+Node Betweenness       | The number of shortest paths in the network that traverse each node.
+Node Closeness         | The relative closeness of a node to all other nodes in the network.
+cGD                    | The length of the shortest path connecting nodes in the Population Graph   
+Edge Betweenness       | The number of shortest paths in the network that traverse each edge    
+Slope<sub>Degree</sub> | The slope of the degree distribution describing the
+Diameter               |   
+ 
 
 ## Assympototic Stability
 
@@ -78,3 +117,28 @@ Asymptotic convergence on topology from random SNP's.
 
 
 ## Sampling Intensity
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Acknowledgements
+
+
+
+
+
+
+

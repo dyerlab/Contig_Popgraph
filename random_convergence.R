@@ -14,21 +14,24 @@ pops <- df$Population
 
 if( !dir.exists("data/random_convergence") ) { 
   dir.create("data/random_convergence") 
+
+  # go through the sizes
+  for( size in sizes ) { 
+    for( rep in 1:numReps) {
+      snps <- sample( df_snps$Name, size=size, replace = FALSE )   
+      data <- df[ , snps ]
+      mv <- to_mv( as.data.frame( data ) )
+      g <- popgraph(mv, pops )
+      g <- set.graph.attribute(g,"snps",paste(snps,collapse=","))
+      fname <- paste("data/random_convergence/graph_",size,"_",rep,".rda", sep="")
+      save(g, file = fname )
+      cat(".")
+    }   
+    cat("\n")
+  }
 }
 
 
-# go through the sizes
-for( size in sizes ) { 
-  for( rep in 1:numReps) {
-    snps <- sample( df_snps$Name, size=size, replace = FALSE )   
-    data <- df[ , snps ]
-    mv <- to_mv( as.data.frame( data ) )
-    g <- popgraph(mv, pops )
-    g <- set.graph.attribute(g,"snps",paste(snps,collapse=","))
-    fname <- paste("data/random_convergence/graph_",size,"_",rep,".rda", sep="")
-    save(g, file = fname )
-    cat(".")
-  }   
-  cat("\n")
-}
+
+
 
