@@ -11,6 +11,10 @@ author:
 date: "`r Sys.Date()`"
 bibliography: bibliography.bib
 output: distill::distill_article
+knit: (function(inputFile, encoding) { 
+  rmarkdown::render(inputFile,
+                    encoding=encoding,
+                    output_file='docs/index.html') })
 ---
 
 ```{r setup, include=FALSE}
