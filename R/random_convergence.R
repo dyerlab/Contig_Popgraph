@@ -1,5 +1,5 @@
-load("data/df_samples.rda")
-load("data/df_snps.rda")
+load("../data/df_samples.rda")
+load("../data/df_snps.rda")
 library( tidyverse )
 library( popgraph )
 library( gstudio )
@@ -12,6 +12,9 @@ sizes <- c(10,seq(20,100,by=20))
 numReps <- 100
 pops <- df$Population
 
+print(getwd())
+
+# If there is no directory, then make one and pull out random shit
 if( !dir.exists("data/random_convergence") ) { 
   dir.create("data/random_convergence") 
 
@@ -23,13 +26,15 @@ if( !dir.exists("data/random_convergence") ) {
       mv <- to_mv( as.data.frame( data ) )
       g <- popgraph(mv, pops )
       g <- set.graph.attribute(g,"snps",paste(snps,collapse=","))
-      fname <- paste("data/random_convergence/graph_",size,"_",rep,".rda", sep="")
+      fname <- paste("../data/random_convergence/graph_",size,"_",rep,".rda", sep="")
       save(g, file = fname )
       cat(".")
     }   
     cat("\n")
   }
 }
+
+
 
 
 
