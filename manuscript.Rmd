@@ -75,6 +75,16 @@ df_snps %>%
 
 ## Topological Similarity
 
+
+### Isomorphism in Graph Structure
+
+As a first pass, one can consider the structural similarity of twwo graphs.  For example, consider the graphs $G$ and $H$, both of which have identical node sets (e.g., the two graphs have the same cardinality in that $V(G) = V(H)$).  For most purposes here, we will only be considering comparisons of graphs that have the identical set of nodes as we are looking at population-level genetic covariance among the same set of populations only with different sets of genetic markers.
+
+In this context, any pair of population graphs are said to be *graph-level isomorphic* if and only if the exact same set of edges in popgraph $G$ are present in other popgraph $H$.
+
+
+
+
 Network similarity may be partitioned into features based upon the *node*, on the *edge*, or on the overall construction of the network itself.  For comparision purposes, we will 
 
 *Node Centric Features*  
@@ -106,6 +116,11 @@ Slope<sub>Degree</sub> | The slope of the degree distribution describing the
 Diameter               |   
  
 
+
+
+
+
+
 ## Assympototic Stability
 
 
@@ -115,9 +130,27 @@ Diameter               |
 Asymptotic convergence on topology from random SNP's.
 
 
-```{r}
+```{r cache=TRUE}
+if( !file.exists("data/df_random_convergence.rda") ) {
+  source("R/random_convergence.R")
+} else { 
+  load("data/df_random_convergence.rda")
+  df_random_convergence %>%
+    ggplot( aes(Size, StructVar)) + 
+    geom_point()
+            
+}
 
 ```
+
+
+*Sequential Markers*
+
+Asymptotic convergence on topollgy from sequential SNP's.
+
+
+
+
 
 
 ## Sampling Intensity
