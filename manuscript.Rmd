@@ -1,5 +1,5 @@
 ---
-title: "Population Graphs On Contigs: Topological Convergence"
+title: "Population Graphs On Contigs I: Sampling Intensity & Topological Convergence"
 description: |
   With the ever increasing use of sequencing in the analysis of both neutral and putatively adaptive genetic variance the ability to recover genetic covartiance becomes increasinly difficult as the density of information rich genetic markers incereases.  In this manuscript, we examine the extent to which population genetic structure, as measured through population graphs, is influenced by locus proximity.
 author:
@@ -25,9 +25,9 @@ options( tidyverse.quiet = TRUE,
 library( tidyverse )
 theme_set( theme_minimal(base_size=14 ))
 
-#if( length(list.files("./data/", pattern = ".sqlite")) < 1 ) { 
-#  source("R/SNPSummaries.R")
-#}
+library( popgraph )
+library( gstudio )
+library( igraph )
 ```
 
 
@@ -82,25 +82,126 @@ df_snps %>%
 
 ### Isomorphism in Graph Structure
 
-As a first pass, one can consider the structural similarity of twwo graphs.  For example, consider the graphs $G$ and $H$, both of which have identical node sets (e.g., the two graphs have the same cardinality in that $V(G) = V(H)$).  For most purposes here, we will only be considering comparisons of graphs that have the identical set of nodes as we are looking at population-level genetic covariance among the same set of populations only with different sets of genetic markers.
+As a first pass, one can consider the structural similarity of two graphs.  For example, consider the graphs $G$ and $H$, both of which have identical node sets (e.g., the two graphs have the same cardinality in that $V(G) = V(H)$).  For most purposes here, we will only be considering comparisons of graphs that have the identical set of nodes as we are looking at population-level genetic covariance among the same set of populations only with different sets of genetic markers.  
 
-In this context, any pair of population graphs are said to be *graph-level isomorphic* if and only if the exact same set of edges in popgraph $G$ are present in other popgraph $H$.
+In this context, any pair of population graphs are said to be *graph-level isomorphic* if and only if the exact same set of edges in popgraph $G$ are present in other popgraph $H$.  Another way of saying this is that a derived *congruence topology*, which is defined as the set of edges that are found in both graphs, has the same number of edges as the parental graphs.  
 
 
 
 *Structural Congruence* 
+
+For questions regarding the arrangement of connections between specific nodes in the topology.  The likelihood that two graphs with isomorphic node sets (say of size $K$), $A$ and $B$, have $m$ edges in common can be determined combinatorialy with the following definitions.  Let $m_A$ be the number of edges in $A$, $m_B$ be the number of edges in graph $B$, and $m_C$ be the number of edges in the congruence topology derived from both $A$ and $B$. The maximum number of potential edges (and hence the ceiling for $m_C$) is $m_{max} = K * (K-1) / 2$.  
+
+
+
+
+```{r}
+
+## Pass this function the 
+getCongruences <- function( files ) { 
+  # Make response matrix to put structural (i<j) and distance congruence (i>j) values
+  A <- matrix(NA,nrow=100,ncol=100)
+  cat("getCongruences: ")
+  for( i in 1:length(files) ) { 
+    load( files[i] )
+    g1 <- g 
+    cat(".")
+    for( j in 1:length(files) ) { 
+      g <- NULL 
+      load(files[j])
+      
+      if( i < j ) { 
+        A[i,j] <- length(E(congruence_topology(g,g1)))
+      } else if( i > j ) { 
+        fit <- test_congruence(g,g1)$statistic
+        if(is.na(fit)) { 
+          
+          
+          
+          cat("na value in congruence", i,j,"\n")
+          print(files[i])
+          print(files[j])
+          stop()
+        }
+        A[i,j] <- test_congruence(g,g1)$statistic
+      }
+    }
+  }
+  cat("\n")
+  ret <- list( "Congruence" = A[upper.tri(A)],
+               "Distance" = A[lower.tri(A)])
+  
+}
+
+
+if(!file.exists("data/df_congruence.rda") ) {
+  df_congruence <- data.frame( NumLoci = NA, 
+                               Congruence = NA, 
+                               Distance = NA )
+  print("Running Congruences")
+  for( numLoci in seq(10,100,by=10) ) { 
+    cat("Congruences derived for", numLoci,"\n")
+    pattern <- paste("graph_",numLoci,"_",sep="")
+    cong <- getCongruences( files = list.files("data/random_convergence", 
+                                               pattern=pattern, 
+                                               full.names = TRUE))
+    df_congruence <- rbind( df_congruence,
+                            data.frame( NumLoci = numLoci,
+                                        Congruence = cong$Congruence, 
+                                        Distance = cong$Distance ) )
+  }
+  df_congruence %>%
+    filter( !is.na(NumLoci)) -> df_congruence
+            
+  save(df_congruence, file="data/df_congruence.rda")
+} 
+
+
+
+
+
+```
+
+
+
+
+
+```{r}
+load("data/df_congruence.rda")
+df_congruence %>%
+  ggplot( aes(as.factor(NumLoci), Congruence) ) + 
+  geom_boxplot( notch=TRUE ) + 
+  xlab("Number of SNP Loci") + 
+  ylab("Varince in Structural Congruence")
+```
+
+
+```{r}
+df_congruence %>%
+  group_by( NumLoci ) %>%
+  summarise( Var = var(Congruence)) -> varCong
+
+
+varCong %>%
+  ggplot( aes(NumLoci, Var) ) + 
+  geom_point() + 
+  stat_smooth(se=FALSE, method="nls", formula = y ~ SSasymp(x,Asym,R0,lrc), linetype=2 ) + 
+  xlab("Number of SNP Loci") + 
+  ylab("Varince in Structural Congruence")
+```
 
 
 
 
 *Distance Congruence*
 
+For questions and hypotheses regarding the relative genetic distnaces between locales as is common in studies of isolation by distance, resistance, and ecology.
 
 
+### Characterisitics of Network Structure
 
 
-
-Network similarity may be partitioned into features based upon the *node*, on the *edge*, or on the overall construction of the network itself.  For comparision purposes, we will 
+Network similarity may be partitioned into features based upon the *node*, on the *edge*, or on the overall construction of the network itself.  For comparison purposes, we will 
 
 *Node Centric Features*  
 
@@ -146,7 +247,7 @@ Diameter               |
 *Random Markers*
 
 
-Asymptotic convergence on topology from random SNP's.
+
 
 
 ```{r}
