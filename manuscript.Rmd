@@ -196,8 +196,8 @@ df_random %>%
 
 df_random %>%
   mutate(Loci=as.factor(NumLoci) ) %>%
-  ggplot( aes(aLoci, Degree) ) + 
-  geom_boxplot()
+  ggplot( aes(Loci, cGD) ) + 
+  geom_boxplot( notch=TRUE )
 
 
 ```
