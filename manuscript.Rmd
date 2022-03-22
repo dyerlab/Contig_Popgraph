@@ -32,11 +32,15 @@ theme_set( theme_minimal(base_size=14 ))
 
 
 
+Are there metrics that can be used to define topological and structural similarity in one or more population graphs?
+
+
 Specifically, we test the following questions:  
 
 1. How many SNP loci are necessary to gain a stable genetic covariance structure as measured through a population graph?
 
-2. Are there metrics that can be used to define topological and structural similarity in one or more population graphs?
+2. How do graph-theoretic properties change with genetic sampling effort as sample sizes tend towards topographic convergence?
+
 
 3. Some other thing.
 
@@ -84,6 +88,17 @@ In this context, any pair of population graphs are said to be *graph-level isomo
 
 
 
+*Structural Congruence* 
+
+
+
+
+*Distance Congruence*
+
+
+
+
+
 
 Network similarity may be partitioned into features based upon the *node*, on the *edge*, or on the overall construction of the network itself.  For comparision purposes, we will 
 
@@ -124,29 +139,73 @@ Diameter               |
 ## Assympototic Stability
 
 
+
+
+
+
 *Random Markers*
 
 
 Asymptotic convergence on topology from random SNP's.
 
 
-```{r cache=TRUE}
-if( !file.exists("data/df_random_convergence.rda") ) {
-  source("R/random_convergence.R")
-} else { 
-  load("data/df_random_convergence.rda")
-  df_random_convergence %>%
-    ggplot( aes(Size, StructVar)) + 
-    geom_point()
-            
+```{r}
+df_random <- data.frame( fname = list.files("data/random_convergence",
+                                            full.names=TRUE)  )
+df_random$NumLoci <- as.numeric( matrix( unlist( strsplit( df_random$fname, "_")),
+                                         ncol=4, 
+                                         byrow=TRUE)[,3])
+df_random$Degree <- NA
+df_random$Diameter <- NA
+df_random$NodeCloseness <- NA
+df_random$NodeBetweenness <- NA
+df_random$EdgeWt <- NA
+df_random$cGD <- NA
+
+for( i in 1:nrow(df_random) ) { 
+  g <- NULL
+  load( df_random$fname[i] )
+  c <- to_matrix(g, mode="shortest path") 
+  df_random$Degree[i] <- mean(degree(g), na.rm=TRUE )
+  df_random$Diameter[i] <- max( c, na.rm=TRUE )
+  df_random$NodeCloseness[i] <- mean(closeness(g), na.rm=TRUE )
+  df_random$NodeBetweenness[i] <- mean( betweenness(g), na.rm=TRUE )
+  df_random$EdgeWt[i] <- mean( to_matrix(g,mode="edge weight"), na.rm=TRUE )
+  cgd <- c[lower.tri(c)] 
+  df_random$cGD[i] <- mean(cgd[ !is.infinite(cgd) ], na.rm=TRUE)
 }
+
+df_random$Diameter[is.infinite(df_random$Diameter)] <- NA
+
+
+df_random %>%
+  group_by( NumLoci ) %>%
+  summarise( Degree = mean(Degree),
+             sdDegree = sd(Degree),
+             Diameter = mean(Diameter, na.rm=TRUE),
+             sdDiameter = sd(Diameter),
+             NodeCloseness = mean(NodeCloseness, na.rm=TRUE),
+             sdNodeCloseNess = sd(NodeCloseness),
+             NodeBetweenness = mean( NodeBetweenness, na.rm=TRUE), 
+             sdNodeBetweeenness = sd( NodeBetweenness ),
+             EdgeWt = mean(EdgeWt, na.rm=TRUE),
+             sdEdgeWt = sd(EdgeWt ),
+             cGD = mean( cGD , na.rm=TRUE),
+             sdcGD = sd(cGD) ) -> rand_summary
+
+
+df_random %>%
+  mutate(Loci=as.factor(NumLoci) ) %>%
+  ggplot( aes(aLoci, Degree) ) + 
+  geom_boxplot()
+
 
 ```
 
 
 *Sequential Markers*
 
-Asymptotic convergence on topollgy from sequential SNP's.
+Asymptotic convergence on topology from sequentialSNP's.
 
 
 
