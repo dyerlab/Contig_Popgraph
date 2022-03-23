@@ -165,17 +165,6 @@ if(!file.exists("data/df_congruence.rda") ) {
 
 
 
-
-```{r}
-load("data/df_congruence.rda")
-df_congruence %>%
-  ggplot( aes(as.factor(NumLoci), Congruence) ) + 
-  geom_boxplot( notch=TRUE ) + 
-  xlab("Number of SNP Loci") + 
-  ylab("Varince in Structural Congruence")
-```
-
-
 ```{r}
 df_congruence %>%
   group_by( NumLoci ) %>%
@@ -185,7 +174,11 @@ df_congruence %>%
 varCong %>%
   ggplot( aes(NumLoci, Var) ) + 
   geom_point() + 
-  stat_smooth(se=FALSE, method="nls", formula = y ~ SSasymp(x,Asym,R0,lrc), linetype=2 ) + 
+  stat_smooth(se=FALSE, 
+              method="nls", 
+              formula = y ~ SSasymp(x,Asym,R0,lrc), 
+              linetype=2,
+              size=1) + 
   xlab("Number of SNP Loci") + 
   ylab("Varince in Structural Congruence")
 ```
