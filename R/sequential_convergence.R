@@ -10,7 +10,8 @@ df_samples %>%
   droplevels() -> df 
 
 # Take sets of different sizes and construct population graphs
-sizes <- seq(90,100,by=10)
+#sizes <- seq(90,100,by=10)
+sizes <- seq(150,500,by=50)
 numReps <- 100
 pops <- df$Population
 

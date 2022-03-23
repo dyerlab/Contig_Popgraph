@@ -10,7 +10,7 @@ df_samples %>%
   droplevels() -> df 
 
 # Take sets of different sizes and construct population graphs
-sizes <- seq(10,100,by=10)
+sizes <- c(seq(10,100,by=10), seq(150,500,by=50))
 numReps <- 100
 pops <- df$Population
 
@@ -26,6 +26,7 @@ for( size in sizes ) {
     data <- df[ , snps ]
     mv <- to_mv( as.data.frame( data ) )
     g <- popgraph(mv, pops )
+    graph.attributes(g)["SNPs"] <- paste( snps, collapse=",")
     fname <- paste("data/random_convergence/graph_",size,"_",rep,".rda", sep="")
     save(g, file=fname  )
     

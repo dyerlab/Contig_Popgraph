@@ -77,6 +77,42 @@ df_snps %>%
   ylab("Frequency")
 ```
 
+
+
+## Disconnected Subgraphs
+
+```{r}
+df_snps$graphs <- 0
+df_snps$disconnected <- 0
+
+for( file in list.files("data/sequential_convergence", full.names = TRUE)  ) { 
+  g <- NULL
+  load(file) 
+  snps <- strsplit(igraph::graph.attributes(g)$SNPs, split=",")[[1]]
+  
+  df_snps$graphs[ df_snps$Name %in% snps ]  <- df_snps$graphs[ df_snps$Name %in% snps ] + 1.0 
+  if( igraph::components(g)$no > 1 ) { 
+    df_snps$disconnected[ df_snps$Name %in% snps]   <- df_snps$disconnected[ df_snps$Name %in% snps]   + 1.0 
+  }
+}
+
+range(df_snps$Location)
+
+df_snps %>%
+  group_by(disconnected) %>%
+  summarize( N = n() )
+
+```
+
+
+
+
+
+
+
+
+
+
 ## Topological Similarity
 
 
@@ -95,7 +131,7 @@ For questions regarding the arrangement of connections between specific nodes in
 
 
 
-```{r}
+```{r warnings=FALSE}
 
 ## Pass this function the 
 getCongruences <- function( files ) { 
@@ -113,17 +149,7 @@ getCongruences <- function( files ) {
       if( i < j ) { 
         A[i,j] <- length(E(congruence_topology(g,g1)))
       } else if( i > j ) { 
-        fit <- test_congruence(g,g1)$statistic
-        if(is.na(fit)) { 
-          
-          
-          
-          cat("na value in congruence", i,j,"\n")
-          print(files[i])
-          print(files[j])
-          stop()
-        }
-        A[i,j] <- test_congruence(g,g1)$statistic
+        A[i,j] <- test_congruence(g,g1)$estimate
       }
     }
   }
@@ -154,7 +180,11 @@ if(!file.exists("data/df_congruence.rda") ) {
     filter( !is.na(NumLoci)) -> df_congruence
             
   save(df_congruence, file="data/df_congruence.rda")
-} 
+
+} else { 
+    load("data/df_congruence.rda")
+}
+
 
 
 
@@ -168,7 +198,7 @@ if(!file.exists("data/df_congruence.rda") ) {
 ```{r}
 df_congruence %>%
   group_by( NumLoci ) %>%
-  summarise( Var = var(Congruence)) -> varCong
+  summarise( Var = mean(Congruence)) -> varCong
 
 
 varCong %>%
@@ -180,7 +210,7 @@ varCong %>%
               linetype=2,
               size=1) + 
   xlab("Number of SNP Loci") + 
-  ylab("Varince in Structural Congruence")
+  ylab("Structural Congruence")
 ```
 
 
@@ -189,6 +219,101 @@ varCong %>%
 *Distance Congruence*
 
 For questions and hypotheses regarding the relative genetic distnaces between locales as is common in studies of isolation by distance, resistance, and ecology.
+
+```{r}
+df_congruence %>%
+  group_by( NumLoci ) %>%
+  summarise( Var = mean(Distance)) -> varDist
+
+
+
+varDist %>%
+  ggplot( aes(NumLoci, Var) ) + 
+  geom_point() + 
+  stat_smooth(se=FALSE, 
+              method="nls", 
+              formula = y ~ SSasymp(x,Asym,R0,lrc), 
+              linetype=2,
+              size=1) + 
+  xlab("Number of SNP Loci") + 
+  ylab("Distance Congruence")
+```
+
+
+
+
+### Window Sampling
+
+
+
+```{r}
+
+if(!file.exists("data/df_seqcongruence.rda") ) {
+  df_seqcongruence <- data.frame( NumLoci = NA, 
+                               Congruence = NA, 
+                               Distance = NA )
+  print("Running Sequential Congruences")
+  for( numLoci in seq(10,100,by=10) ) { 
+    cat("Congruences derived for", numLoci,"\n")
+    pattern <- paste("graph_",numLoci,"_",sep="")
+    cong <- getCongruences( files = list.files("data/sequential_convergence", 
+                                               pattern=pattern, 
+                                               full.names = TRUE))
+    df_seqcongruence <- rbind( df_congruence,
+                            data.frame( NumLoci = numLoci,
+                                        Congruence = cong$Congruence, 
+                                        Distance = cong$Distance ) )
+  }
+  df_seqcongruence %>%
+    filter( !is.na(NumLoci)) -> df_seqcongruence
+            
+  save(df_congruence, file="data/df_seqcongruence.rda")
+
+} else { 
+    load("data/df_seqcongruence.rda")
+}
+
+```
+
+
+
+*Structural Congruence*
+
+
+```{r}
+df_seqcongruence %>%
+  group_by(NumLoci) %>%
+  summarise(`Structural Congruence` = mean( Congruence ) ) %>%
+  ggplot( aes(NumLoci, `Structural Congruence`) ) + 
+  geom_point() +  
+  stat_smooth(se=FALSE, 
+              method="nls", 
+              formula = y ~ SSasymp(x,Asym,R0,lrc), 
+              linetype=2,
+              size=1) + 
+  xlab("Number of SNP Loci") 
+```
+
+
+
+*Distance Congruence*
+
+
+
+```{r}
+df_seqcongruence %>%
+  group_by(NumLoci) %>%
+  summarise(`Distance Congruence` = mean( Distance ) ) %>%
+  ggplot( aes(NumLoci, `Distance Congruence`) ) + 
+  geom_point() +  
+  stat_smooth(se=FALSE, 
+              method="nls", 
+              formula = y ~ SSasymp(x,Asym,R0,lrc), 
+              linetype=2,
+              size=1) + 
+  xlab("Number of SNP Loci") 
+```
+
 
 
 ### Characterisitics of Network Structure
