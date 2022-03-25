@@ -259,7 +259,7 @@ if(!file.exists("data/df_seqcongruence.rda") ) {
     cong <- getCongruences( files = list.files("data/sequential_convergence", 
                                                pattern=pattern, 
                                                full.names = TRUE))
-    df_seqcongruence <- rbind( df_congruence,
+    df_seqcongruence <- rbind( df_seqcongruence,
                             data.frame( NumLoci = numLoci,
                                         Congruence = cong$Congruence, 
                                         Distance = cong$Distance ) )
@@ -267,7 +267,7 @@ if(!file.exists("data/df_seqcongruence.rda") ) {
   df_seqcongruence %>%
     filter( !is.na(NumLoci)) -> df_seqcongruence
             
-  save(df_congruence, file="data/df_seqcongruence.rda")
+  save(df_seqcongruence, file="data/df_seqcongruence.rda")
 
 } else { 
     load("data/df_seqcongruence.rda")
