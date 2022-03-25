@@ -285,10 +285,13 @@ df_seqcongruence %>%
   group_by(NumLoci) %>%
   summarise(`Structural Congruence` = mean( Congruence ) ) %>%
   ggplot( aes(NumLoci, `Structural Congruence`) ) + 
-  geom_point() +  
+  geom_point() +    
   stat_smooth(se=FALSE, 
               method="nls", 
               formula = y ~ SSasymp(x,Asym,R0,lrc), 
+              method.args = list(start = c( Asym = 32.1,
+                                            R0 = 34.8,
+                                            lrc= 0.0008)),
               linetype=2,
               size=1) + 
   xlab("Number of SNP Loci") 
@@ -303,7 +306,7 @@ df_seqcongruence %>%
 ```{r}
 df_seqcongruence %>%
   group_by(NumLoci) %>%
-  summarise(`Distance Congruence` = mean( Distance ) ) %>%
+  summarise(`Distance Congruence` = mean( Distance, na.rm=TRUE) ) %>%
   ggplot( aes(NumLoci, `Distance Congruence`) ) + 
   geom_point() +  
   stat_smooth(se=FALSE, 
