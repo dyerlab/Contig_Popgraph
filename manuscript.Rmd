@@ -79,30 +79,6 @@ df_snps %>%
 
 
 
-## Disconnected Subgraphs
-
-```{r}
-df_snps$graphs <- 0
-df_snps$disconnected <- 0
-
-for( file in list.files("data/sequential_convergence", full.names = TRUE)  ) { 
-  g <- NULL
-  load(file) 
-  snps <- strsplit(igraph::graph.attributes(g)$SNPs, split=",")[[1]]
-  
-  df_snps$graphs[ df_snps$Name %in% snps ]  <- df_snps$graphs[ df_snps$Name %in% snps ] + 1.0 
-  if( igraph::components(g)$no > 1 ) { 
-    df_snps$disconnected[ df_snps$Name %in% snps]   <- df_snps$disconnected[ df_snps$Name %in% snps]   + 1.0 
-  }
-}
-
-range(df_snps$Location)
-
-df_snps %>%
-  group_by(disconnected) %>%
-  summarize( N = n() )
-
-```
 
 
 
@@ -159,13 +135,14 @@ getCongruences <- function( files ) {
   
 }
 
+NUMLOCI <- c(seq(10,100,by=10), seq(150,500,by=50) )
 
 if(!file.exists("data/df_congruence.rda") ) {
   df_congruence <- data.frame( NumLoci = NA, 
                                Congruence = NA, 
                                Distance = NA )
   print("Running Congruences")
-  for( numLoci in seq(10,100,by=10) ) { 
+  for( numLoci in NUMLOCI ) { 
     cat("Congruences derived for", numLoci,"\n")
     pattern <- paste("graph_",numLoci,"_",sep="")
     cong <- getCongruences( files = list.files("data/random_convergence", 
@@ -198,19 +175,17 @@ if(!file.exists("data/df_congruence.rda") ) {
 ```{r}
 df_congruence %>%
   group_by( NumLoci ) %>%
-  summarise( Var = mean(Congruence)) -> varCong
+  summarise( Var = var(Congruence)) -> varCong
 
 
 varCong %>%
   ggplot( aes(NumLoci, Var) ) + 
   geom_point() + 
-  stat_smooth(se=FALSE, 
-              method="nls", 
-              formula = y ~ SSasymp(x,Asym,R0,lrc), 
+  stat_smooth(se=FALSE,
               linetype=2,
               size=1) + 
   xlab("Number of SNP Loci") + 
-  ylab("Structural Congruence")
+  ylab("Variance In Structural Congruence")
 ```
 
 
@@ -223,20 +198,18 @@ For questions and hypotheses regarding the relative genetic distnaces between lo
 ```{r}
 df_congruence %>%
   group_by( NumLoci ) %>%
-  summarise( Var = mean(Distance)) -> varDist
+  summarise( Var = var(Distance)) -> varDist
 
 
 
 varDist %>%
   ggplot( aes(NumLoci, Var) ) + 
   geom_point() + 
-  stat_smooth(se=FALSE, 
-              method="nls", 
-              formula = y ~ SSasymp(x,Asym,R0,lrc), 
+  stat_smooth(se=FALSE,
               linetype=2,
               size=1) + 
   xlab("Number of SNP Loci") + 
-  ylab("Distance Congruence")
+  ylab("Variance In Distance Congruence")
 ```
 
 
@@ -253,7 +226,7 @@ if(!file.exists("data/df_seqcongruence.rda") ) {
                                Congruence = NA, 
                                Distance = NA )
   print("Running Sequential Congruences")
-  for( numLoci in seq(10,100,by=10) ) { 
+  for( numLoci in NUMLOCI  ) { 
     cat("Congruences derived for", numLoci,"\n")
     pattern <- paste("graph_",numLoci,"_",sep="")
     cong <- getCongruences( files = list.files("data/sequential_convergence", 
@@ -283,18 +256,14 @@ if(!file.exists("data/df_seqcongruence.rda") ) {
 ```{r}
 df_seqcongruence %>%
   group_by(NumLoci) %>%
-  summarise(`Structural Congruence` = mean( Congruence ) ) %>%
+  summarise(`Structural Congruence` = var( Congruence ) ) %>%
   ggplot( aes(NumLoci, `Structural Congruence`) ) + 
   geom_point() +    
-  stat_smooth(se=FALSE, 
-              method="nls", 
-              formula = y ~ SSasymp(x,Asym,R0,lrc), 
-              method.args = list(start = c( Asym = 32.1,
-                                            R0 = 34.8,
-                                            lrc= 0.0008)),
+  stat_smooth(se=FALSE,
               linetype=2,
               size=1) + 
-  xlab("Number of SNP Loci") 
+  xlab("Number of SNP Loci") + 
+  ylab("Variance In Structural Congruence")
 ```
 
 
@@ -306,16 +275,62 @@ df_seqcongruence %>%
 ```{r}
 df_seqcongruence %>%
   group_by(NumLoci) %>%
-  summarise(`Distance Congruence` = mean( Distance, na.rm=TRUE) ) %>%
+  summarise(`Distance Congruence` = var( Distance, na.rm=TRUE) ) %>%
   ggplot( aes(NumLoci, `Distance Congruence`) ) + 
   geom_point() +  
-  stat_smooth(se=FALSE, 
-              method="nls", 
-              formula = y ~ SSasymp(x,Asym,R0,lrc), 
+  stat_smooth(se=FALSE,
               linetype=2,
               size=1) + 
-  xlab("Number of SNP Loci") 
+  xlab("Number of SNP Loci") + 
+  ylab("Variance In Distance Congruence")
 ```
+
+
+
+
+
+
+
+
+
+
+
+## Disconnected Subgraphs
+
+```{r}
+df_snps$graphs <- 0
+df_snps$disconnected <- 0
+
+for( file in list.files("data/random_convergence", pattern = "graph_100_*", full.names = TRUE)  ) { 
+  g <- NULL
+  load(file) 
+  snps <- strsplit(igraph::graph.attributes(g)$SNPs, split=",")[[1]]
+  
+  df_snps$graphs[ df_snps$Name %in% snps ]  <- df_snps$graphs[ df_snps$Name %in% snps ] + 1.0 
+  if( igraph::components(g)$no > 1 ) { 
+    df_snps$disconnected[ df_snps$Name %in% snps]   <- df_snps$disconnected[ df_snps$Name %in% snps]   + 1.0 
+  }
+}
+
+df_snps %>%
+  filter( graphs > 0 ) %>% 
+  group_by(disconnected) %>%
+  summarize( N = n() ) %>%
+  ggplot( aes(disconnected,N) )  + 
+  geom_col() + 
+  xlab("Number of Disconnected Graphs") + 
+  ylab("Frequency")
+```
+
+
+
+
+
+
+
+
+
+
 
 
 
