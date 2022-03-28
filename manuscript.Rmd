@@ -94,17 +94,17 @@ df_snps %>%
 
 ### Isomorphism in Graph Structure
 
-As a first pass, one can consider the structural similarity of two graphs.  For example, consider the graphs $G$ and $H$, both of which have identical node sets (e.g., the two graphs have the same cardinality in that $V(G) = V(H)$).  For most purposes here, we will only be considering comparisons of graphs that have the identical set of nodes as we are looking at population-level genetic covariance among the same set of populations only with different sets of genetic markers.  
+As a first pass, one can consider the  similarity of two graphs.  For example, consider the graphs $G$ and $H$, both of which have identical node sets (e.g., the two graphs have the same cardinality in that $V(G) = V(H)$).  For most purposes here, we will only be considering comparisons of graphs that have the identical set of nodes as we are looking at population-level genetic covariance among the same set of populations only with different sets of genetic markers.  
 
-In this context, any pair of population graphs are said to be *graph-level isomorphic* if and only if the exact same set of edges in popgraph $G$ are present in other popgraph $H$.  Another way of saying this is that a derived *congruence topology*, which is defined as the set of edges that are found in both graphs, has the same number of edges as the parental graphs.  
+In this context, any pair of population graphs are said to be *graph-level isomorphic* if and only if the exact same set of edges in popgraph $G$ are present in other popgraph $H$.  For this paper, I will refer to this a *structural congruence* to designate that it is the set of similar edges in the two networks that are the focus of the question.   
 
+
+In addition to structural congruence, population graphs may be similar because they have a similar configuration of the overall distances between sampling locals, independent of the sequence of edges through which they traverse.  This is the most commonly used approach as we typically estimate the measure of distance between sites from the genetic data and relate that to some measure of separation caused by space, ecology, vicariance, etc.  The distinction here is that the actual path, and by extension the individual connections between sampling locales, are not the focus of the question, only the cumulative distance between nodes.   
 
 
 *Structural Congruence* 
 
-For questions regarding the arrangement of connections between specific nodes in the topology.  The likelihood that two graphs with isomorphic node sets (say of size $K$), $A$ and $B$, have $m$ edges in common can be determined combinatorialy with the following definitions.  Let $m_A$ be the number of edges in $A$, $m_B$ be the number of edges in graph $B$, and $m_C$ be the number of edges in the congruence topology derived from both $A$ and $B$. The maximum number of potential edges (and hence the ceiling for $m_C$) is $m_{max} = K * (K-1) / 2$.  
-
-
+For questions regarding the arrangement of connections between specific nodes in the topology.  The likelihood that two graphs with isomorphic node sets (say of size $K$), $A$ and $B$, have $m$ edges in common can be determined combinatorially with the following definitions.  Let $m_A$ be the number of edges in $A$, $m_B$ be the number of edges in graph $B$, and $m_C$ be the number of edges in the congruence topology derived from both $A$ and $B$. The maximum number of potential edges (and hence the ceiling for $m_C$) is $m_{max} = K * (K-1) / 2$.  
 
 
 ```{r warnings=FALSE}
@@ -162,11 +162,6 @@ if(!file.exists("data/df_congruence.rda") ) {
     load("data/df_congruence.rda")
 }
 
-
-
-
-
-
 ```
 
 
@@ -182,6 +177,8 @@ varCong %>%
   ggplot( aes(NumLoci, Var) ) + 
   geom_point() + 
   stat_smooth(se=FALSE,
+              method = "loess",
+              formula = y ~ x,
               linetype=2,
               size=1) + 
   xlab("Number of SNP Loci") + 
@@ -193,15 +190,27 @@ varCong %>%
 
 *Distance Congruence*
 
-For questions and hypotheses regarding the relative genetic distnaces between locales as is common in studies of isolation by distance, resistance, and ecology.
+For questions and hypotheses regarding the relative genetic distances between locales as is common in studies of isolation by distance, resistance, and ecology.
 
-```{r}
+```{r, warning=FALSE}
 df_congruence %>%
   group_by( NumLoci ) %>%
   summarise( Var = var(Distance)) -> varDist
 
+varDist %>%
+  filter( NumLoci <= 100) %>%
+  ggplot( aes(NumLoci, Var) ) + 
+  geom_point() + 
+  stat_smooth(se=FALSE,
+              linetype=2,
+              size=1) + 
+  xlab("Number of SNP Loci") + 
+  ylab("Variance In Distance Congruence")
+```
 
 
+
+```{r}
 varDist %>%
   ggplot( aes(NumLoci, Var) ) + 
   geom_point() + 
@@ -274,6 +283,7 @@ df_seqcongruence %>%
 
 ```{r}
 df_seqcongruence %>%
+  filter( NumLoci <= 100) %>%
   group_by(NumLoci) %>%
   summarise(`Distance Congruence` = var( Distance, na.rm=TRUE) ) %>%
   ggplot( aes(NumLoci, `Distance Congruence`) ) + 
@@ -286,6 +296,18 @@ df_seqcongruence %>%
 ```
 
 
+```{r}
+df_seqcongruence %>%
+  group_by(NumLoci) %>%
+  summarise(`Distance Congruence` = var( Distance, na.rm=TRUE) ) %>%
+  ggplot( aes(NumLoci, `Distance Congruence`) ) + 
+  geom_point() +  
+  stat_smooth(se=FALSE,
+              linetype=2,
+              size=1) + 
+  xlab("Number of SNP Loci") + 
+  ylab("Variance In Distance Congruence")
+```
 
 
 
@@ -324,6 +346,9 @@ df_snps %>%
 
 
 
+## Sensitivity Analysis
+
+How do we determine if some subset of loci in a population graph are having differential impact on the overall structure?
 
 
 
@@ -331,131 +356,43 @@ df_snps %>%
 
 
 
+### Locus Sensitivity
 
 
-
-### Characterisitics of Network Structure
-
-
-Network similarity may be partitioned into features based upon the *node*, on the *edge*, or on the overall construction of the network itself.  For comparison purposes, we will 
-
-*Node Centric Features*  
-
-- *Degree* The number of edges connected to a particular node in the network.    
-- *Node Betweenness* A measure of the relative number of the shortest paths in the network that contain each node.
-- *Node Closeness* The relative distance of a node to all other nodes in the network. 
-
-
-*Edge Centric Features*
-
-- *Edge Betweenness* The relative number of shortest paths in the entire network that contain each edge.
-- *Distance Congruence* The r
-- *Structural Congruence* 
-
-*Graph Features*
-
-- *Diameter* The distance through the graph connecting the two most distant nodes.
-- *Slope<sub>Degree</sub>* - 
-
-Feature                | Description    
------------------------|------------------------------   
-Degree                 | The number of edges connected to a node    
-Node Betweenness       | The number of shortest paths in the network that traverse each node.
-Node Closeness         | The relative closeness of a node to all other nodes in the network.
-cGD                    | The length of the shortest path connecting nodes in the Population Graph   
-Edge Betweenness       | The number of shortest paths in the network that traverse each edge    
-Slope<sub>Degree</sub> | The slope of the degree distribution describing the
-Diameter               |   
- 
-
-
-
-
-
-
-## Assympototic Stability
-
-
-
-
-
-
-*Random Markers*
-
-
+\[
+det(A-\lambda I) = 0 
+\]
 
 
 
 ```{r}
-df_random <- data.frame( fname = list.files("data/random_convergence",
-                                            full.names=TRUE)  )
-df_random$NumLoci <- as.numeric( matrix( unlist( strsplit( df_random$fname, "_")),
-                                         ncol=4, 
-                                         byrow=TRUE)[,3])
-df_random$Degree <- NA
-df_random$Diameter <- NA
-df_random$NodeCloseness <- NA
-df_random$NodeBetweenness <- NA
-df_random$EdgeWt <- NA
-df_random$cGD <- NA
-
-for( i in 1:nrow(df_random) ) { 
-  g <- NULL
-  load( df_random$fname[i] )
-  c <- to_matrix(g, mode="shortest path") 
-  df_random$Degree[i] <- mean(degree(g), na.rm=TRUE )
-  df_random$Diameter[i] <- max( c, na.rm=TRUE )
-  df_random$NodeCloseness[i] <- mean(closeness(g), na.rm=TRUE )
-  df_random$NodeBetweenness[i] <- mean( betweenness(g), na.rm=TRUE )
-  df_random$EdgeWt[i] <- mean( to_matrix(g,mode="edge weight"), na.rm=TRUE )
-  cgd <- c[lower.tri(c)] 
-  df_random$cGD[i] <- mean(cgd[ !is.infinite(cgd) ], na.rm=TRUE)
-}
-
-df_random$Diameter[is.infinite(df_random$Diameter)] <- NA
 
 
-df_random %>%
-  group_by( NumLoci ) %>%
-  summarise( Degree = mean(Degree),
-             sdDegree = sd(Degree),
-             Diameter = mean(Diameter, na.rm=TRUE),
-             sdDiameter = sd(Diameter),
-             NodeCloseness = mean(NodeCloseness, na.rm=TRUE),
-             sdNodeCloseNess = sd(NodeCloseness),
-             NodeBetweenness = mean( NodeBetweenness, na.rm=TRUE), 
-             sdNodeBetweeenness = sd( NodeBetweenness ),
-             EdgeWt = mean(EdgeWt, na.rm=TRUE),
-             sdEdgeWt = sd(EdgeWt ),
-             cGD = mean( cGD , na.rm=TRUE),
-             sdcGD = sd(cGD) ) -> rand_summary
-
-
-df_random %>%
-  mutate(Loci=as.factor(NumLoci) ) %>%
-  ggplot( aes(Loci, cGD) ) + 
-  geom_boxplot( notch=TRUE )
 
 
 ```
 
 
-*Sequential Markers*
 
-Asymptotic convergence on topology from sequentialSNP's.
-
-
-
-
-
-
-## Sampling Intensity
+### Locale Sensitivity
 
 
 
 
 
 
+
+
+
+
+
+
+
+# Discussion
+
+
+
+1. Adding more data does not tend towards a concensus graph because of unequal 
 
 
 
