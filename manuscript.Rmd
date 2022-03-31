@@ -52,8 +52,10 @@ Specifically, we test the following questions:
 
 1. filter snps
  - p >= 0.05
- - ICR for heterozygosity
- - 
+ - ICR for Fis
+
+2. Create snps for random and 
+ 
 
 
 
@@ -67,29 +69,20 @@ For the purposes of this paper, genetic topologies will be created using conditi
 
 ```{r}
 load("data/df_snps.rda")
-
-
+df_snps$usable <- (df_snps$p >= 0.05) & ( df_snps$F >= 0.069 & df_snps$F <= 0.172351 )
 ```
-
 
 For this manuscript, single nucleotide polymorphisms (SNP) data from HGDP-CEPH for Chromosome 2 were used due to the relative density of variable markers.  These data consist of `r K` mapped variable nucleotide sites.  Distances between individual snps ranged from `r min(df_snps$dist, na.rm=TRUE)`bp - `r format(max(df_snps$dist, na.rm=TRUE),digits=2, scientific=TRUE)`bp (the largest spanning the centromere), whose distribution of inter-snp distances are arranged as shown in Figure \@ref(fig:snp-distance). 
 
 ```{r snp-distance, fig.cap="The distribution of nearest neighbor distances for individual SNPs along Chromosome 2"}
 df_snps %>%
-  filter( !is.na(neighbor_dist) ) %>%
-  ggplot( aes(log(dist,base = 10)  ) ) + 
+  filter( !is.na(neighbor_dist),
+          usable=TRUE) %>%
+  ggplot( aes(log(neighbor_dist,base = 10)  ) ) + 
   geom_density()  + 
   xlab(expression(log[10](Nucleotide~Distance))) +
   ylab("Frequency")
 ```
-
-
-```{r}
-
-```
-
-
-
 
 
 
