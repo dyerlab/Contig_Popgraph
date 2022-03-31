@@ -17,9 +17,18 @@ system("head -1 data/chr2.umich.phased.ordered.snp > data/snps_rss_names.txt")
 system("head -5 data/chr2.umich.phased.ordered.snp | tail -1 > data/snps_positions.txt")
 names <- str_split( readLines("data/snps_rss_names.txt", n=1), pattern = " " )[[1]]
 locations <- str_split( readLines("data/snps_positions.txt", n=1), pattern = " " )[[1]]
-data.frame( Name = names, Location = as.numeric(locations) ) %>%
+data.frame( Name = names, 
+            Location = as.numeric(locations),
+            Ho = NA,
+            He = NA,
+            p = NA
+            ) %>%
   arrange( Location ) -> df_snps 
 
+# go through each of the snps and estimate Neighbor dist, Ho, He, p, and F
+K <- nrow(df_snps)
+df_snps$neighbor_dist <- NA
+df_snps$neighbor_dist[2:K] = df_snps$Location[2:K] - df_snps$Location[1:(K-1)]
 
 
 # Pull meta data and save a data.frame
@@ -58,12 +67,18 @@ for( i in 8:maxLoci) {
   locus_name <- df_snps$Name[ (i - 7) ]
   df_samples[[locus_name]] <- loci
   
+  df_snps$Ho[ df_snps$Name == locus_name] <- Ho(loci)$Ho
+  df_snps$He[ df_snps$Name == locus_name] <- He(loci)$He
+  df_snps$p[ df_snps$Name == locus_name] <- min(frequencies(loci)$Frequency)
   
   if( (i - 8) %% lineLength == 0) {
     cat("[", i/lineLength, "/", maxLoci, "]\n")
   }
   
 }
+
+df_snps$F <- 1.0 - df_snps$Ho / df_snps$He
+
 
 save(df_samples, file="data/df_samples.rda")
 save(df_snps, file="data/df_snps.rda")

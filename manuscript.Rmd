@@ -50,6 +50,13 @@ Specifically, we test the following questions:
 # Methods
 
 
+1. filter snps
+ - p >= 0.05
+ - ICR for heterozygosity
+ - 
+
+
+
 ## Graph Theoretic Definitions
 
 A graph contains two sets of objects, *nodes* often representing sampling locales, populations, or regions, and *edges* which specify the relationships between individual nodes.  In population genetic studies, graphs are often defined based upon pair-wise genetic distances (Nei's Distance, $D_{ps}$, etc.) or estimates of structure (pairwise $F_{ST}$, cGD, etc).
@@ -61,6 +68,7 @@ For the purposes of this paper, genetic topologies will be created using conditi
 ```{r}
 load("data/df_snps.rda")
 
+
 ```
 
 
@@ -69,7 +77,7 @@ For this manuscript, single nucleotide polymorphisms (SNP) data from HGDP-CEPH f
 ```{r snp-distance, fig.cap="The distribution of nearest neighbor distances for individual SNPs along Chromosome 2"}
 df_snps %>%
   filter( !is.na(neighbor_dist) ) %>%
-  ggplot( aes(log(neighbor_dist,base = 10)  ) ) + 
+  ggplot( aes(log(dist,base = 10)  ) ) + 
   geom_density()  + 
   xlab(expression(log[10](Nucleotide~Distance))) +
   ylab("Frequency")
