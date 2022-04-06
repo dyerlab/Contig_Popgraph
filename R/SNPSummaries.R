@@ -79,6 +79,9 @@ for( i in 8:maxLoci) {
 
 df_snps$F <- 1.0 - df_snps$Ho / df_snps$He
 
+df_samples %>%
+  filter( !(Population %in% c("CEU_HapMap","JPT_HapMap","YRI_HapMap", "CHB_HapMap" ))) %>%
+  droplevels() -> df_samples
 
 save(df_samples, file="data/df_samples.rda")
 save(df_snps, file="data/df_snps.rda")
