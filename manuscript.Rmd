@@ -70,6 +70,7 @@ For the purposes of this paper, genetic topologies will be created using conditi
 ```{r}
 load("data/df_snps.rda")
 df_snps$usable <- (df_snps$p >= 0.05) & ( df_snps$F >= 0.069 & df_snps$F <= 0.172351 )
+K <- sum( df_sn)
 ```
 
 For this manuscript, single nucleotide polymorphisms (SNP) data from HGDP-CEPH for Chromosome 2 were used due to the relative density of variable markers.  These data consist of `r K` mapped variable nucleotide sites.  Distances between individual snps ranged from `r min(df_snps$dist, na.rm=TRUE)`bp - `r format(max(df_snps$dist, na.rm=TRUE),digits=2, scientific=TRUE)`bp (the largest spanning the centromere), whose distribution of inter-snp distances are arranged as shown in Figure \@ref(fig:snp-distance). 
@@ -139,7 +140,7 @@ getCongruences <- function( files ) {
   
 }
 
-NUMLOCI <- c(seq(10,100,by=10), seq(150,500,by=25) )
+NUMLOCI <- seq(25,500,by=25)
 
 if(!file.exists("data/df_congruence.rda") ) {
   df_congruence <- data.frame( NumLoci = NA, 
@@ -199,17 +200,7 @@ For questions and hypotheses regarding the relative genetic distances between lo
 ```{r, warning=FALSE}
 df_congruence %>%
   group_by( NumLoci ) %>%
-  summarise( Var = var(Distance)) -> varDist
-
-varDist %>%
-  filter( NumLoci <= 100) %>%
-  ggplot( aes(NumLoci, Var) ) + 
-  geom_point() + 
-  stat_smooth(se=FALSE,
-              linetype=2,
-              size=1) + 
-  xlab("Number of SNP Loci") + 
-  ylab("Variance In Distance Congruence")
+  summarise( Var = var(Distance, na.rm=TRUE)) -> varDist
 ```
 
 
@@ -220,7 +211,9 @@ varDist %>%
   geom_point() + 
   stat_smooth(se=FALSE,
               linetype=2,
-              size=1) + 
+              size=1, 
+              method="loess", 
+              formula="y~x") + 
   xlab("Number of SNP Loci") + 
   ylab("Variance In Distance Congruence")
 ```
@@ -287,21 +280,7 @@ df_seqcongruence %>%
 
 ```{r}
 df_seqcongruence %>%
-  filter( NumLoci <= 100) %>%
-  group_by(NumLoci) %>%
-  summarise(`Distance Congruence` = var( Distance, na.rm=TRUE) ) %>%
-  ggplot( aes(NumLoci, `Distance Congruence`) ) + 
-  geom_point() +  
-  stat_smooth(se=FALSE,
-              linetype=2,
-              size=1) + 
-  xlab("Number of SNP Loci") + 
-  ylab("Variance In Distance Congruence")
-```
 
-
-```{r}
-df_seqcongruence %>%
   group_by(NumLoci) %>%
   summarise(`Distance Congruence` = var( Distance, na.rm=TRUE) ) %>%
   ggplot( aes(NumLoci, `Distance Congruence`) ) + 
