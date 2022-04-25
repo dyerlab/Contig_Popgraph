@@ -11,7 +11,7 @@ df_snps %>%
           F <= quantile(F,9/10)) -> df_snps
 
 # Take sets of different sizes and construct population graphs
-sizes <- seq(25,500, by=25)
+sizes <- seq(10, 500, by=10)
 numReps <- 100
 pops <- df_samples$Population
 
@@ -21,13 +21,16 @@ for( size in sizes ) {
   for( rep in 1:numReps) {
     g <- NULL
     
-    snps <- sample( df_snps$Name, size=size, replace = FALSE )   
-    data <- df_samples[ , snps ]
-    mv <- to_mv( as.data.frame( data ) )
-    g <- popgraph(mv, pops )
-    graph.attributes(g)["SNPs"] <- paste( snps, collapse=",")
     fname <- paste("data/random_convergence/graph_",size,"_",rep,".rda", sep="")
-    save(g, file=fname  )
+    if( !file.exists(fname) ) { 
+      snps <- sample( df_snps$Name, size=size, replace = FALSE )   
+      data <- df_samples[ , snps ]
+      mv <- to_mv( as.data.frame( data ) )
+      g <- popgraph(mv, pops )
+      graph.attributes(g)["SNPs"] <- paste( snps, collapse=",")
+      save(g, file=fname  )  
+    }
+    
     cat(".")
   }   
   cat("\n")

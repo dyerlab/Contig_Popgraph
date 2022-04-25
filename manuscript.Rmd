@@ -70,7 +70,7 @@ For the purposes of this paper, genetic topologies will be created using conditi
 ```{r}
 load("data/df_snps.rda")
 df_snps$usable <- (df_snps$p >= 0.05) & ( df_snps$F >= 0.069 & df_snps$F <= 0.172351 )
-K <- sum( df_sn)
+K <- sum( df_snps$usable )
 ```
 
 For this manuscript, single nucleotide polymorphisms (SNP) data from HGDP-CEPH for Chromosome 2 were used due to the relative density of variable markers.  These data consist of `r K` mapped variable nucleotide sites.  Distances between individual snps ranged from `r min(df_snps$dist, na.rm=TRUE)`bp - `r format(max(df_snps$dist, na.rm=TRUE),digits=2, scientific=TRUE)`bp (the largest spanning the centromere), whose distribution of inter-snp distances are arranged as shown in Figure \@ref(fig:snp-distance). 
@@ -96,9 +96,6 @@ df_snps %>%
 
 ## Topological Similarity
 
-
-### Isomorphism in Graph Structure
-
 As a first pass, one can consider the  similarity of two graphs.  For example, consider the graphs $G$ and $H$, both of which have identical node sets (e.g., the two graphs have the same cardinality in that $V(G) = V(H)$).  For most purposes here, we will only be considering comparisons of graphs that have the identical set of nodes as we are looking at population-level genetic covariance among the same set of populations only with different sets of genetic markers.  
 
 In this context, any pair of population graphs are said to be *graph-level isomorphic* if and only if the exact same set of edges in popgraph $G$ are present in other popgraph $H$.  For this paper, I will refer to this a *structural congruence* to designate that it is the set of similar edges in the two networks that are the focus of the question.   
@@ -107,7 +104,7 @@ In this context, any pair of population graphs are said to be *graph-level isomo
 In addition to structural congruence, population graphs may be similar because they have a similar configuration of the overall distances between sampling locals, independent of the sequence of edges through which they traverse.  This is the most commonly used approach as we typically estimate the measure of distance between sites from the genetic data and relate that to some measure of separation caused by space, ecology, vicariance, etc.  The distinction here is that the actual path, and by extension the individual connections between sampling locales, are not the focus of the question, only the cumulative distance between nodes.   
 
 
-*Structural Congruence* 
+### Structural Congruence
 
 For questions regarding the arrangement of connections between specific nodes in the topology.  The likelihood that two graphs with isomorphic node sets (say of size $K$), $A$ and $B$, have $m$ edges in common can be determined combinatorially with the following definitions.  Let $m_A$ be the number of edges in $A$, $m_B$ be the number of edges in graph $B$, and $m_C$ be the number of edges in the congruence topology derived from both $A$ and $B$. The maximum number of potential edges (and hence the ceiling for $m_C$) is $m_{max} = K * (K-1) / 2$.  
 
@@ -169,6 +166,18 @@ if(!file.exists("data/df_congruence.rda") ) {
 
 ```
 
+
+
+### Distance Congruence
+
+
+
+
+
+
+
+
+### Sampling Intensity
 
 
 

@@ -12,7 +12,7 @@ df_snps %>%
 
 
 # Take sets of different sizes and construct population graphs
-sizes <- seq(25,500,by=25)
+sizes <- seq(10, 500, by=10)
 numReps <- 100
 pops <- df_samples$Population
 
