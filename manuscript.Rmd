@@ -137,7 +137,7 @@ getCongruences <- function( files ) {
   
 }
 
-NUMLOCI <- seq(25,500,by=25)
+NUMLOCI <- seq(10,500,by=10)
 
 if(!file.exists("data/df_congruence.rda") ) {
   df_congruence <- data.frame( NumLoci = NA, 
@@ -287,7 +287,7 @@ df_seqcongruence %>%
 
 
 
-```{r}
+```{r, warning=FALSE}
 df_seqcongruence %>%
 
   group_by(NumLoci) %>%
@@ -296,7 +296,7 @@ df_seqcongruence %>%
   geom_point() +  
   stat_smooth(se=FALSE,
               linetype=2,
-              size=1) + 
+              size=1, method="loess", formula=y~x) + 
   xlab("Number of SNP Loci") + 
   ylab("Variance In Distance Congruence")
 ```
