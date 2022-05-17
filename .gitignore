@@ -44,4 +44,6 @@ vignettes/*.pdf
 manuscript.html
 *.vcf
 .DS_Store
+*.snp
+
 
