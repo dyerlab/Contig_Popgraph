@@ -42,4 +42,6 @@ vignettes/*.pdf
 # Ignore any data derived from the single original data set.
 *.icloud
 manuscript.html
+*.vcf
+.DS_Store
 
