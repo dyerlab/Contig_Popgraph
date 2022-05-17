@@ -1,0 +1,68 @@
+data/13098/AM_Chr2L_1_23011544.vcf
+    - done
+data/13098/AUS_Chr2L_1_23011544.vcf
+    - done
+data/13098/CHB_Chr2L_1_23011544.vcf
+    - done
+data/13098/CO_Chr2L_1_23011544.vcf
+    - done
+data/13098/EA_Chr2L_1_23011544.vcf
+    - done
+data/13098/EB_Chr2L_1_23011544.vcf
+    - done
+data/13098/ED_Chr2L_1_23011544.vcf
+    - done
+data/13098/EF_Chr2L_1_23011544.vcf
+    - done
+data/13098/EG_Chr2L_1_23011544.vcf
+    - done
+data/13098/ENA_Chr2L_1_23011544.vcf
+    - done
+data/13098/EQA_Chr2L_1_23011544.vcf
+    - done
+data/13098/ER_Chr2L_1_23011544.vcf
+    - done
+data/13098/EZ_Chr2L_1_23011544.vcf
+    - done
+data/13098/FR_Chr2L_1_23011544.vcf
+    - done
+data/13098/GA_Chr2L_1_23011544.vcf
+    - done
+data/13098/GU_Chr2L_1_23011544.vcf
+    - done
+data/13098/KN_Chr2L_1_23011544.vcf
+    - done
+data/13098/KR_Chr2L_1_23011544.vcf
+    - done
+data/13098/MW_Chr2L_1_23011544.vcf
+    - done
+data/13098/NG_Chr2L_1_23011544.vcf
+    - done
+data/13098/NTH_Chr2L_1_23011544.vcf
+    - done
+data/13098/RAL_Chr2L_1_23011544.vcf
+    - done
+data/13098/RG_Chr2L_1_23011544.vcf
+    - done
+data/13098/SA_Chr2L_1_23011544.vcf
+    - done
+data/13098/SB_Chr2L_1_23011544.vcf
+    - done
+data/13098/SD_Chr2L_1_23011544.vcf
+    - done
+data/13098/SF_Chr2L_1_23011544.vcf
+    - done
+data/13098/SP_Chr2L_1_23011544.vcf
+    - done
+data/13098/UG_Chr2L_1_23011544.vcf
+    - done
+data/13098/UK_Chr2L_1_23011544.vcf
+    - done
+data/13098/USI_Chr2L_1_23011544.vcf
+    - done
+data/13098/USW_Chr2L_1_23011544.vcf
+    - done
+data/13098/ZI_Chr2L_1_23011544.vcf
+    - done
+data/13098/ZS_Chr2L_1_23011544.vcf
+    - done
