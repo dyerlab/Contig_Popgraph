@@ -15,7 +15,7 @@ for( file in fly[2:length(fly)]) {
 
 
 
-# load them all in for loci in commmon
+# load them all in for loci in common
 load(fly[1])
 data <- df[ , loci]
 for( file in fly[2:length(fly)]) {

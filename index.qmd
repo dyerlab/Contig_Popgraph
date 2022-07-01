@@ -1,0 +1,33 @@
+---
+title: "Spatial Genetic Covariant Decomposition & Classification"
+description: |
+  The spatial distribution of genetic structure is created by the interaction of both micro and macro-evolutionary processes.
+format: html
+toc: true
+editor: visual
+author: 
+  - name: "Rodney J. Dyer"
+    url: https://dyerlab.org 
+    affiliation: "Center for Environmental Studies<br/>Virginia Commonwealth University<br/>1000 West Cary Street<br/>Richmond Virginia 23284"
+    affiliation-url: https://ces.vcu.edu 
+    orcid_id: 0000-0003-4707-3453
+---
+
+```{r setup, include=FALSE}
+library(gstudio)
+library(popgraph)
+```
+
+## Introduction
+
+The decomposition of spatial genetic structure is ...
+
+Genetic covariance is a measure of the extent to which two or more populations or locales appear to share a common evolutionary trajectory.
+
+This manuscript develops a heuristic approach for measuring, comparing, and classifying differing spatial patterns
+
+## Spatial Structure
+
+## Measures of Congruence
+
+## Example: Human & Drosophilia 
