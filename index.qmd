@@ -11,6 +11,10 @@ author:
     affiliation: "Center for Environmental Studies<br/>Virginia Commonwealth University<br/>1000 West Cary Street<br/>Richmond Virginia 23284"
     affiliation-url: https://ces.vcu.edu 
     orcid_id: 0000-0003-4707-3453
+knit: (function(inputFile, encoding) { 
+  rmarkdown::render(inputFile,
+                    encoding=encoding,
+                    output_file='docs/index.html') })  
 ---
 
 ```{r setup, include=FALSE}
@@ -31,3 +35,5 @@ This manuscript develops a heuristic approach for measuring, comparing, and clas
 ## Measures of Congruence
 
 ## Example: Human & Drosophilia 
+
+## Discussion
